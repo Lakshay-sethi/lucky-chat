@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -23,11 +24,17 @@ export default {
         foreground: "#FAFAF8",
         muted: "#828179",
         accent: "#61AAF2",
+        primary: "hsl(var(--primary))",
+        "primary-foreground": "hsl(var(--primary-foreground))",
+        secondary: "hsl(var(--secondary))",
+        "secondary-foreground": "hsl(var(--secondary-foreground))",
+        border: "#ffffff14",
+        destructive: "hsl(var(--destructive))",
+        "destructive-foreground": "hsl(var(--destructive-foreground))",
         bubble: {
           received: "#4B5563",
           sent: "#61AAF2",
         },
-        border: "#ffffff14",
       },
       backdropBlur: {
         xs: '2px',

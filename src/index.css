@@ -59,7 +59,7 @@
 }
 
 .message-bubble.sent {
-  @apply bg-primary/70 text-white rounded-tr-none;
+  @apply bg-primary bg-opacity-70 text-white rounded-tr-none;
 }
 
 .message-bubble.received {
