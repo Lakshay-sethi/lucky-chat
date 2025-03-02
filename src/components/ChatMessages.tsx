@@ -91,6 +91,22 @@ export const ChatMessages = () => {
             (msg.sender_id === receiverId && msg.receiver_id === user.id)
         );
         setMessages(filteredMessages);
+        
+        // Mark received messages as read
+        const unreadMessages = filteredMessages.filter(
+          msg => msg.sender_id === receiverId && !msg.read
+        );
+        
+        if (unreadMessages.length > 0) {
+          const unreadIds = unreadMessages.map(msg => msg.id);
+          supabase
+            .from("messages")
+            .update({ read: true })
+            .in("id", unreadIds)
+            .then(({ error }) => {
+              if (error) console.error("Error marking messages as read:", error);
+            });
+        }
       }
       setLoading(false);
     };
@@ -104,17 +120,40 @@ export const ChatMessages = () => {
         event: 'INSERT', 
         schema: 'public', 
         table: 'messages',
-        filter: `sender_id=eq.${user.id},receiver_id=eq.${receiverId}` 
+        filter: `sender_id=eq.${receiverId},receiver_id=eq.${user.id}` 
       }, payload => {
+        // Add new message to state
         setMessages(prevMessages => [...prevMessages, payload.new as Message]);
+        
+        // Mark as read automatically since we're in the chat
+        supabase
+          .from("messages")
+          .update({ read: true })
+          .eq("id", payload.new.id)
+          .then(({ error }) => {
+            if (error) console.error("Error marking message as read:", error);
+          });
       })
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
         table: 'messages',
-        filter: `sender_id=eq.${receiverId},receiver_id=eq.${user.id}` 
+        filter: `sender_id=eq.${user.id},receiver_id=eq.${receiverId}` 
       }, payload => {
         setMessages(prevMessages => [...prevMessages, payload.new as Message]);
+      })
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'messages',
+        filter: `sender_id=eq.${receiverId},receiver_id=eq.${user.id}` 
+      }, payload => {
+        // Update message (e.g., read status)
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === payload.new.id ? { ...msg, ...payload.new } : msg
+          )
+        );
       })
       .subscribe();
 
@@ -183,10 +222,6 @@ export const ChatMessages = () => {
       } else {
         setNewMessage("");
         setSelectedImage(null);
-        toast({
-          description: "Message sent",
-          duration: 2000,
-        });
       }
     } catch (error) {
       console.error("Error:", error);
@@ -330,4 +365,3 @@ export const ChatMessages = () => {
     </div>
   );
 };
-
