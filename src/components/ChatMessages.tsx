@@ -1,4 +1,3 @@
-
 import { Avatar } from "@/components/ui/avatar";
 import { Check, Info, Send } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -255,10 +254,10 @@ export const ChatMessages = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-screen">
+    <div className="flex-1 flex flex-col h-screen bg-background">
       {receiver ? (
         <>
-          <div className="glass p-4 flex items-center justify-between">
+          <div className="border-b border-border p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
                 <img src={receiver.avatar_url || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"} alt={receiver.username} className="object-cover" />
@@ -273,7 +272,7 @@ export const ChatMessages = () => {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide">
             {messages.map((message) => (
               <div 
                 key={message.id} 
@@ -312,8 +311,8 @@ export const ChatMessages = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={handleSendMessage} className="p-4">
-            <div className="glass rounded-full p-2 flex items-center gap-2">
+          <div className="p-4 border-t border-border">
+            <div className="bg-white/5 rounded-full p-2 flex items-center gap-2">
               <label htmlFor="image-upload" className="cursor-pointer p-2 hover:bg-white/5 rounded-full transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -340,22 +339,24 @@ export const ChatMessages = () => {
                   </button>
                 </div>
               )}
-              <input
-                type="text"
-                placeholder="Type a message..."
-                className="flex-1 bg-transparent outline-none px-2"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-              />
-              <button 
-                type="submit"
-                className="p-2 hover:bg-white/5 rounded-full transition-colors"
-                disabled={!newMessage.trim() && !selectedImage}
-              >
-                <Send className="w-5 h-5" />
-              </button>
+              <form onSubmit={handleSendMessage} className="flex-1 flex">
+                <input
+                  type="text"
+                  placeholder="Type a message..."
+                  className="flex-1 bg-transparent outline-none px-2"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                />
+                <button 
+                  type="submit"
+                  className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                  disabled={!newMessage.trim() && !selectedImage}
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </form>
             </div>
-          </form>
+          </div>
         </>
       ) : (
         <div className="flex flex-col items-center justify-center h-full">

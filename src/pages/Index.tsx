@@ -44,40 +44,23 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      <header className="bg-background border-b border-border p-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-accent">Lucky Chat</h1>
-        <div className="flex items-center gap-2">
-          {user && (
-            <span className="text-sm text-muted mr-2">
-              {user.email}
-            </span>
-          )}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleLogout}
-            className="text-muted hover:text-foreground"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
-        </div>
-      </header>
-      <div className="flex flex-1 overflow-hidden">
-        <ChatSidebar />
-        <Routes>
-          <Route path="/" element={
-            <div className="flex-1 flex items-center justify-center bg-muted/10">
-              <div className="text-center p-8">
-                <h2 className="text-2xl font-semibold mb-2">Welcome to Lucky Chat</h2>
-                <p className="text-muted mb-4">Select a conversation or start a new one to begin chatting</p>
-              </div>
+    <div className="flex h-screen overflow-hidden">
+      <ChatSidebar />
+      <Routes>
+        <Route path="/" element={
+          <div className="flex-1 flex items-center justify-center bg-background">
+            <div className="text-center p-8">
+              <h2 className="text-2xl font-semibold mb-2">Welcome to Lucky Chat</h2>
+              <p className="text-muted mb-4">Select a conversation or start a new one to begin chatting</p>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
             </div>
-          } />
-          <Route path="/:receiverId" element={<ChatMessages />} />
-        </Routes>
-      </div>
+          </div>
+        } />
+        <Route path="/:receiverId" element={<ChatMessages />} />
+      </Routes>
     </div>
   );
 };

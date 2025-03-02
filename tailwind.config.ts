@@ -20,20 +20,20 @@ export default {
     },
     extend: {
       colors: {
-        background: "#141413",
+        background: "#121212", // Darker background
         foreground: "#FAFAF8",
         muted: "#828179",
         accent: "#61AAF2",
-        primary: "hsl(var(--primary))",
-        "primary-foreground": "hsl(var(--primary-foreground))",
-        secondary: "hsl(var(--secondary))",
-        "secondary-foreground": "hsl(var(--secondary-foreground))",
-        border: "#ffffff14",
+        primary: "#55A9F9", // Blue for sent messages
+        "primary-foreground": "#FFFFFF",
+        secondary: "#4A4A4C", // Dark gray for received messages
+        "secondary-foreground": "#FFFFFF",
+        border: "#2D2D2D", // Darker border
         destructive: "hsl(var(--destructive))",
         "destructive-foreground": "hsl(var(--destructive-foreground))",
         bubble: {
-          received: "#4B5563",
-          sent: "#61AAF2",
+          received: "#4A4A4C", // Dark gray bubbles
+          sent: "#55A9F9", // Blue bubbles
         },
       },
       backdropBlur: {

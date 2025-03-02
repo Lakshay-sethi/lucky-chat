@@ -5,25 +5,25 @@
 
 @layer base {
   :root {
-    --background: 20 14.3% 4.1%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 95%;
-    --card: 24 9.8% 10%;
+    --card: 0 0% 9%;
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 63.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 12 6.5% 15.1%;
+    --primary: 210 90% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 30%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 64%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 12 7% 15%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142.4 71.8% 29.2%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 142 72% 29%;
     --radius: 0.5rem;
   }
 }
@@ -39,9 +39,9 @@
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(42, 42, 42, 0.3);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(70, 70, 70, 0.2);
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -55,13 +55,13 @@
 
 /* Message bubbles styling */
 .message-bubble {
-  @apply px-4 py-2 rounded-lg max-w-full break-words;
+  @apply px-4 py-2 rounded-xl max-w-full break-words;
 }
 
 .message-bubble.sent {
-  @apply bg-primary bg-opacity-70 text-white rounded-tr-none;
+  @apply bg-primary text-white rounded-tr-none;
 }
 
 .message-bubble.received {
-  @apply bg-secondary text-secondary-foreground rounded-tl-none;
+  @apply bg-secondary text-white rounded-tl-none;
 }
