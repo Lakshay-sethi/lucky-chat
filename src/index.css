@@ -1,47 +1,29 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 9%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 210 90% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 4% 30%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 64%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 12 7% 15%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 142 72% 29%;
-    --radius: 0.5rem;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground antialiased;
   }
 }
 
-.glass {
-  background: rgba(42, 42, 42, 0.3);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(70, 70, 70, 0.2);
+@layer utilities {
+  .glass {
+    @apply bg-opacity-20 backdrop-blur-sm border border-white/10;
+  }
+}
+
+.message-bubble {
+  @apply rounded-2xl px-4 py-2 max-w-[80%] break-words;
+}
+
+.message-bubble.sent {
+  @apply bg-bubble-sent text-white ml-auto;
+}
+
+.message-bubble.received {
+  @apply bg-bubble-received text-white;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -51,17 +33,4 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* Message bubbles styling */
-.message-bubble {
-  @apply px-4 py-2 rounded-xl max-w-full break-words;
-}
-
-.message-bubble.sent {
-  @apply bg-primary text-white rounded-tr-none;
-}
-
-.message-bubble.received {
-  @apply bg-secondary text-white rounded-tl-none;
 }

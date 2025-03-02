@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,21 +19,15 @@ export default {
     },
     extend: {
       colors: {
-        background: "#121212", // Darker background
+        background: "#141413",
         foreground: "#FAFAF8",
         muted: "#828179",
         accent: "#61AAF2",
-        primary: "#55A9F9", // Blue for sent messages
-        "primary-foreground": "#FFFFFF",
-        secondary: "#4A4A4C", // Dark gray for received messages
-        "secondary-foreground": "#FFFFFF",
-        border: "#2D2D2D", // Darker border
-        destructive: "hsl(var(--destructive))",
-        "destructive-foreground": "hsl(var(--destructive-foreground))",
         bubble: {
-          received: "#4A4A4C", // Dark gray bubbles
-          sent: "#55A9F9", // Blue bubbles
+          received: "#4B5563",
+          sent: "#61AAF2",
         },
+        border: "#ffffff14",
       },
       backdropBlur: {
         xs: '2px',
