@@ -1,4 +1,4 @@
-import { Search, Plus, Info } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 
 interface User {
@@ -9,10 +9,30 @@ interface User {
 }
 
 const users: User[] = [
-  { id: "1", name: "Buke", avatar: "/avatars/1.png", status: "hgfjghjj" },
-  { id: "2", name: "Joseph", avatar: "/avatars/2.png", status: "hello!" },
-  { id: "3", name: "maryam", avatar: "/avatars/3.png", status: "hh" },
-  { id: "4", name: "Matt", avatar: "/avatars/4.png", status: "Helo" },
+  { 
+    id: "1", 
+    name: "Sarah Parker", 
+    avatar: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158", 
+    status: "Working on the new design" 
+  },
+  { 
+    id: "2", 
+    name: "Mike Johnson", 
+    avatar: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952", 
+    status: "In a meeting" 
+  },
+  { 
+    id: "3", 
+    name: "Emma Wilson", 
+    avatar: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d", 
+    status: "Available" 
+  },
+  { 
+    id: "4", 
+    name: "Tom Anderson", 
+    avatar: "https://images.unsplash.com/photo-1582562124811-c09040d0a901", 
+    status: "Busy" 
+  },
 ];
 
 export const ChatSidebar = () => {
@@ -21,9 +41,13 @@ export const ChatSidebar = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar className="w-8 h-8">
-            <img src="/avatars/elin.png" alt="Elin" />
+            <img 
+              src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7" 
+              alt="Me" 
+              className="object-cover"
+            />
           </Avatar>
-          <span className="font-medium">Elin</span>
+          <span className="font-medium">Me</span>
         </div>
         <button className="p-2 hover:bg-white/5 rounded-full transition-colors">
           <Plus className="w-5 h-5" />
@@ -46,7 +70,7 @@ export const ChatSidebar = () => {
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
           >
             <Avatar className="w-10 h-10">
-              <img src={user.avatar} alt={user.name} />
+              <img src={user.avatar} alt={user.name} className="object-cover" />
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="font-medium">{user.name}</div>
