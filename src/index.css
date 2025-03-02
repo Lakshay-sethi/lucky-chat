@@ -32,5 +32,7 @@
 
 .scrollbar-hide {
   -ms-overflow-style: none;
-  scrollbar-width: none;
+  overflow: -moz-scrollbars-none;
+  -ms-overflow-style: none;
+  scrollbar-width: none; /* For Firefox */
 }

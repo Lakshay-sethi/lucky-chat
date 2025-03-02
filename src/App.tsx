@@ -13,7 +13,7 @@ import Index from "./pages/Index";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
