@@ -136,6 +136,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
       
       setMessages(conversationMessages as Message[]);
+      
+      // Automatically mark messages as read when the conversation is opened
+      markMessagesAsRead();
     };
 
     fetchMessages();
