@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -66,15 +67,14 @@ export const UserSettingsModal = ({ isOpen, onClose, currentUser, onUserUpdate }
       if (uploadError) throw uploadError;
 
       // Generate signed URL
-    const { data: { signedUrl }, error: signedUrlError } = await supabase.storage
-      .from('user_avatars')
-      .createSignedUrl(fileName, 6000000); // URL valid for 60 seconds
+      const { data: { signedUrl }, error: signedUrlError } = await supabase.storage
+        .from('user_avatars')
+        .createSignedUrl(fileName, 6000000); // URL valid for 60 seconds
 
-    if (signedUrlError) throw signedUrlError;
+      if (signedUrlError) throw signedUrlError;
 
-    console.log("Signed URL:", signedUrl);
-    setAvatarUrl(signedUrl);
-      
+      console.log("Signed URL:", signedUrl);
+      setAvatarUrl(signedUrl);
       
     } catch (error: unknown) {
       toast({
@@ -96,15 +96,17 @@ export const UserSettingsModal = ({ isOpen, onClose, currentUser, onUserUpdate }
       
       if (!user) throw new Error("No authenticated user found");
       console.log("Image url:", avatarUrl);
-      // Update user profile
+
+      // Update user profile - use type assertion to bypass the type mismatch
       const updateData = {
         username: name,
         avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
       };
       
-      const { error: updateError } = await supabase
-        .from('profiles')
+      // Use type assertion to fix TypeScript error
+      const { error: updateError } = await (supabase
+        .from('profiles') as any)
         .update(updateData)
         .eq('id', user.id);
 

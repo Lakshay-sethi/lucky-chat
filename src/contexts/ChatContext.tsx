@@ -42,8 +42,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fetchCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data, error } = await supabase
-          .from('profiles')
+        const { data, error } = await (supabase
+          .from('profiles') as any)
           .select('*')
           .eq('id', user.id)
           .single();
@@ -63,8 +63,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch all users
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
+      const { data, error } = await (supabase
+        .from('profiles') as any)
         .select('*');
 
       if (error) {
@@ -118,8 +118,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const fetchMessages = async () => {
-      const { data, error } = await supabase
-        .from('messages')
+      const { data, error } = await (supabase
+        .from('messages') as any)
         .select('*')
         .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
         .order('created_at', { ascending: true });
@@ -131,7 +131,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Filter messages for the selected conversation
       const conversationMessages = (data as any[]).filter(
-        msg => (msg.sender_id === currentUser.id && msg.receiver_id === selectedUser.id) || 
+        (msg: Message) => (msg.sender_id === currentUser.id && msg.receiver_id === selectedUser.id) || 
                (msg.sender_id === selectedUser.id && msg.receiver_id === currentUser.id)
       );
       
@@ -186,8 +186,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       read: false
     };
 
-    const { error } = await supabase
-      .from('messages')
+    const { error } = await (supabase
+      .from('messages') as any)
       .insert([newMessage]);
 
     if (error) {
@@ -205,8 +205,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (unreadMessages.length === 0) return;
 
-    const { error } = await supabase
-      .from('messages')
+    const { error } = await (supabase
+      .from('messages') as any)
       .update({ read: true })
       .in('id', unreadMessages.map(msg => msg.id));
 
