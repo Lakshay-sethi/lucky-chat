@@ -53,7 +53,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        setCurrentUser(data);
+        setCurrentUser(data as ChatUser);
       }
     };
 
@@ -72,7 +72,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      setUsers(data || []);
+      setUsers(data as ChatUser[] || []);
     };
 
     fetchUsers();
@@ -130,12 +130,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Filter messages for the selected conversation
-      const conversationMessages = data.filter(
+      const conversationMessages = (data as any[]).filter(
         msg => (msg.sender_id === currentUser.id && msg.receiver_id === selectedUser.id) || 
                (msg.sender_id === selectedUser.id && msg.receiver_id === currentUser.id)
       );
       
-      setMessages(conversationMessages);
+      setMessages(conversationMessages as Message[]);
     };
 
     fetchMessages();
@@ -188,7 +188,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { error } = await supabase
       .from('messages')
-      .insert(newMessage);
+      .insert([newMessage]);
 
     if (error) {
       console.error('Error sending message:', error);

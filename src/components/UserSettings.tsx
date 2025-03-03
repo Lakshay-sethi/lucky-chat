@@ -13,6 +13,7 @@ interface UserSettingsModalProps {
   currentUser: { id: string; username: string; avatar_url: string } | null;
   onUserUpdate: () => void;
 }
+
 interface Profile {
   id: string;
   username: string;
@@ -53,7 +54,7 @@ export const UserSettingsModal = ({ isOpen, onClose, currentUser, onUserUpdate }
 
       // Upload new image to Supabase Storage
       const fileExt = file.name.split('.').pop();
-      const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
+      const fileName = `${currentUser?.id}-${Math.random()}.${fileExt}`;
       
       const { data, error: uploadError } = await supabase.storage
         .from('user_avatars')
@@ -96,13 +97,15 @@ export const UserSettingsModal = ({ isOpen, onClose, currentUser, onUserUpdate }
       if (!user) throw new Error("No authenticated user found");
       console.log("Image url:", avatarUrl);
       // Update user profile
+      const updateData = {
+        username: name,
+        avatar_url: avatarUrl,
+        updated_at: new Date().toISOString(),
+      };
+      
       const { error: updateError } = await supabase
         .from('profiles')
-        .update<Profile>({
-          username: name,
-          avatar_url: avatarUrl,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', user.id);
 
       if (updateError) throw updateError;
