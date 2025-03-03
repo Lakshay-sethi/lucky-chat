@@ -50,14 +50,14 @@ export const ChatMessages = () => {
 
   if (!selectedUser) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center h-screen text-muted">
+      <div className="flex-1 flex flex-col items-center justify-center">
         <p>Select a chat to start messaging</p>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col h-screen">
+    <div className="flex-1 flex flex-col">
       <div className="glass p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10">

@@ -20,7 +20,7 @@ export const ChatSidebar = () => {
   );
 
   return (
-    <div className="w-80 h-screen glass p-4 flex flex-col gap-4">
+    <div className="w-80 glass p-4 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar className="w-8 h-8">
