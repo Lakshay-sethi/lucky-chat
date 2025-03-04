@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message, ChatUser } from '@/types/chat.types';
@@ -100,23 +99,37 @@ export const useMessages = (currentUser: ChatUser | null) => {
     }
   };
 
-  // Mark messages as read
   const markMessagesAsRead = async () => {
-    if (!currentUser || !selectedUser) return;
+    if (!currentUser || !selectedUser) {
+      console.log('No current user or selected user');
+      return;
+    }
 
     const unreadMessages = messages.filter(
-      msg => msg.sender_id === selectedUser.id && msg.receiver_id === currentUser.id && !msg.read
+      msg => msg.sender_id === selectedUser.id && 
+             msg.receiver_id === currentUser.id && 
+             !msg.read
     );
 
-    if (unreadMessages.length === 0) return;
+    console.log('Unread messages found:', unreadMessages);
+    
+    if (unreadMessages.length === 0) {
+      console.log('No unread messages to mark');
+      return;
+    }
+
+    const messageIds = unreadMessages.map(msg => msg.id);
+    console.log('Message IDs to update:', messageIds);
 
     const { error } = await (supabase
       .from('messages') as any)
       .update({ read: true })
-      .in('id', unreadMessages.map(msg => msg.id));
+      .in('id', messageIds);
 
     if (error) {
       console.error('Error marking messages as read:', error);
+    } else {
+      console.log('Successfully marked messages as read');
     }
   };
 
