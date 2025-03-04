@@ -23,10 +23,14 @@ interface ChatContextType {
   selectedUser: ChatUser | null;
   users: ChatUser[];
   messages: Message[];
+  activeConversations: ChatUser[];
+  nonConversationUsers: ChatUser[];
   setSelectedUser: (user: ChatUser | null) => void;
   sendMessage: (content: string) => Promise<void>;
   markMessagesAsRead: () => Promise<void>;
   getUnreadCount: (userId: string) => number;
+  isNewConversationOpen: boolean;
+  setIsNewConversationOpen: (isOpen: boolean) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -37,6 +41,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [users, setUsers] = useState<ChatUser[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [allMessages, setAllMessages] = useState<Message[]>([]);
+  const [isNewConversationOpen, setIsNewConversationOpen] = useState(false);
 
   // Fetch current user
   useEffect(() => {
@@ -180,7 +185,30 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
     
     setMessages(conversationMessages);
+
+    // Mark messages as read when conversation is selected
+    markMessagesAsRead();
   }, [currentUser, selectedUser, allMessages]);
+
+  // Get users with active conversations
+  const activeConversations = users.filter(user => {
+    if (!currentUser || user.id === currentUser.id) return false;
+    
+    return allMessages.some(
+      msg => (msg.sender_id === currentUser.id && msg.receiver_id === user.id) || 
+             (msg.sender_id === user.id && msg.receiver_id === currentUser.id)
+    );
+  });
+
+  // Get users without active conversations
+  const nonConversationUsers = users.filter(user => {
+    if (!currentUser || user.id === currentUser.id) return false;
+    
+    return !allMessages.some(
+      msg => (msg.sender_id === currentUser.id && msg.receiver_id === user.id) || 
+             (msg.sender_id === user.id && msg.receiver_id === currentUser.id)
+    );
+  });
 
   // Send message
   const sendMessage = async (content: string) => {
@@ -239,10 +267,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         selectedUser,
         users,
         messages,
+        activeConversations,
+        nonConversationUsers,
         setSelectedUser,
         sendMessage,
         markMessagesAsRead,
-        getUnreadCount
+        getUnreadCount,
+        isNewConversationOpen,
+        setIsNewConversationOpen
       }}
     >
       {children}

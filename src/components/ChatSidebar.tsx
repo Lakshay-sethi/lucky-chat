@@ -1,21 +1,27 @@
 
 import { Search, Plus, Settings } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { UserSettingsModal } from "./UserSettings";
 import { Button } from "@/components/ui/button";
 import { useChat } from "@/contexts/ChatContext";
 import { Badge } from "./ui/badge-custom";
+import { NewConversationDialog } from "./NewConversationDialog";
 
 export const ChatSidebar = () => {
-  const { currentUser, users, selectedUser, setSelectedUser, getUnreadCount } = useChat();
+  const { 
+    currentUser, 
+    activeConversations, 
+    selectedUser, 
+    setSelectedUser, 
+    getUnreadCount,
+    setIsNewConversationOpen
+  } = useChat();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter users
-  const filteredUsers = users.filter(user => 
-    user.id !== currentUser?.id && 
+  // Filter active conversations
+  const filteredConversations = activeConversations.filter(user => 
     user.username?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -43,6 +49,7 @@ export const ChatSidebar = () => {
           <Button
             variant="ghost"
             size="icon"
+            onClick={() => setIsNewConversationOpen(true)}
           >
             <Plus className="w-5 h-5" />
           </Button>
@@ -53,7 +60,7 @@ export const ChatSidebar = () => {
         <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" />
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="Search conversations..."
           className="w-full bg-white/5 rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-1 ring-white/20 transition-all"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -61,7 +68,7 @@ export const ChatSidebar = () => {
       </div>
 
       <div className="flex-1 space-y-2 overflow-y-auto scrollbar-hide">
-        {filteredUsers.map((user) => {
+        {filteredConversations.map((user) => {
           const unreadCount = getUnreadCount(user.id);
           const isSelected = selectedUser?.id === user.id;
           
@@ -81,17 +88,21 @@ export const ChatSidebar = () => {
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{user.username}</div>
               </div>
-              <Badge count={unreadCount} />
+              {unreadCount > 0 && (
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              )}
             </div>
           );
         })}
       </div>
+
       <UserSettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         currentUser={currentUser}
         onUserUpdate={() => {}}
       />
+      <NewConversationDialog />
     </div>
   );
 };
