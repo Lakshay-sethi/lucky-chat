@@ -17,7 +17,7 @@ const Landing = () => {
           <Button asChild className="bg-accent hover:bg-accent/90 text-white px-8 py-6 text-lg rounded-full">
             <Link to="/auth">Get Started</Link>
           </Button>
-          <Button asChild variant="outline" className="border-accent text-accent hover:bg-accent/10 px-8 py-6 text-lg rounded-full">
+          <Button asChild variant="outline" className="border-accent hover:bg-accent/10 px-8 py-6 text-lg rounded-full">
             <Link to="/auth?mode=login">Login</Link>
           </Button>
         </div>
