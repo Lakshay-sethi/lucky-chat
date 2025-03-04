@@ -19,11 +19,7 @@ export const ChatMessages = () => {
   // Mark messages as read when viewing the conversation
   useEffect(() => {
     if (selectedUser) {
-      const timer = setTimeout(() => {
-        markMessagesAsRead();
-      }, 1000); // Small delay to ensure UI updates first
-      
-      return () => clearTimeout(timer);
+      markMessagesAsRead();
     }
   }, [selectedUser, messages, markMessagesAsRead]);
 

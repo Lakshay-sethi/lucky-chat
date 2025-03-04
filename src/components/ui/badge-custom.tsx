@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { cn } from "@/lib/utils";
-import { CircleDot } from "lucide-react";
 
 interface BadgeProps {
   count: number;
@@ -13,10 +12,10 @@ export const Badge: React.FC<BadgeProps> = ({ count, className }) => {
   
   return (
     <div className={cn(
-      "text-primary flex items-center justify-center",
+      "bg-primary text-white text-xs font-medium rounded-full px-2 py-0.5 min-w-5 flex items-center justify-center",
       className
     )}>
-      <CircleDot className="w-4 h-4 text-primary" />
+      {count > 99 ? '99+' : count}
     </div>
   );
 };
