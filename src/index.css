@@ -70,3 +70,25 @@
 .user-active {
   @apply bg-white/10;
 }
+
+/* Date separators in chat */
+.date-separator {
+  @apply flex justify-center my-4;
+}
+
+.date-separator-text {
+  @apply px-3 py-1 text-xs bg-black/20 text-white/70 rounded-full;
+}
+
+/* Grouped messages */
+.message-group {
+  @apply space-y-1;
+}
+
+.message-group-avatar {
+  @apply w-8 h-8 shrink-0;
+}
+
+.message-placeholder {
+  @apply w-8 h-8 shrink-0;
+}

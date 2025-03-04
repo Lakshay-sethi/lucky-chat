@@ -6,6 +6,7 @@ export type Message = {
   content: string;
   created_at: string;
   read: boolean;
+  image_url?: string | null;
 };
 
 export type ChatUser = {

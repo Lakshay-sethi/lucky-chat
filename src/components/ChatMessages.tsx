@@ -4,7 +4,32 @@ import { Info } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { useChat } from "@/contexts/ChatContext";
-import { format } from "date-fns";
+import { format, isToday, isYesterday, isSameDay, parseISO } from "date-fns";
+
+// Helper function to format dates for message groups
+const formatMessageDate = (dateString: string) => {
+  const date = parseISO(dateString);
+  if (isToday(date)) {
+    return "Today";
+  } else if (isYesterday(date)) {
+    return "Yesterday";
+  } else {
+    return format(date, "MMMM d, yyyy");
+  }
+};
+
+// Helper to check if messages are from the same sender in a short time window
+const shouldGroupMessages = (curr: any, prev: any) => {
+  if (!prev) return false;
+  if (curr.sender_id !== prev.sender_id) return false;
+  
+  // Group messages sent within 5 minutes of each other
+  const currDate = parseISO(curr.created_at);
+  const prevDate = parseISO(prev.created_at);
+  const diffInMinutes = Math.abs(currDate.getTime() - prevDate.getTime()) / (1000 * 60);
+  
+  return diffInMinutes < 5;
+};
 
 export const ChatMessages = () => {
   const { currentUser, selectedUser, messages, sendMessage, markMessagesAsRead } = useChat();
@@ -47,10 +72,33 @@ export const ChatMessages = () => {
   // Format timestamp
   const formatMessageTime = (timestamp: string) => {
     try {
-      return format(new Date(timestamp), "HH:mm");
+      return format(parseISO(timestamp), "HH:mm");
     } catch (e) {
       return "";
     }
+  };
+
+  // Group messages by date
+  const groupMessagesByDate = () => {
+    const groups: { date: string; messages: any[] }[] = [];
+    
+    messages.forEach((message, index) => {
+      const messageDate = parseISO(message.created_at);
+      const dateString = format(messageDate, "yyyy-MM-dd");
+      
+      // Check if we need to create a new date group
+      const lastGroup = groups.length > 0 ? groups[groups.length - 1] : null;
+      if (!lastGroup || lastGroup.date !== dateString) {
+        groups.push({
+          date: dateString,
+          messages: [message]
+        });
+      } else {
+        lastGroup.messages.push(message);
+      }
+    });
+    
+    return groups;
   };
 
   if (!selectedUser) {
@@ -60,6 +108,8 @@ export const ChatMessages = () => {
       </div>
     );
   }
+
+  const messageGroups = groupMessagesByDate();
 
   return (
     <div className="flex-1 flex flex-col">
@@ -90,31 +140,52 @@ export const ChatMessages = () => {
             <p>No messages yet. Say hello!</p>
           </div>
         ) : (
-          messages.map((message) => {
-            const isMe = message.sender_id === currentUser?.id;
-            const sender = isMe ? currentUser : selectedUser;
-            
-            return (
-              <div key={message.id} className={`flex items-end gap-2 ${isMe ? "flex-row-reverse" : ""}`}>
-                <Avatar className="w-8 h-8">
-                  <img 
-                    src={sender?.avatar_url || "https://placeholder.com/avatar"} 
-                    alt={sender?.username || ""} 
-                    className="object-cover"
-                  />
-                </Avatar>
-                <div className="flex flex-col gap-1">
-                  <div className={`message-bubble ${isMe ? "sent" : "received"}`}>
-                    {message.content}
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-muted">
-                    {formatMessageTime(message.created_at)}
-                    {isMe && message.read && <span className="w-3 h-3">✓</span>}
-                  </div>
+          messageGroups.map((group, groupIndex) => (
+            <div key={group.date} className="space-y-4">
+              <div className="flex justify-center">
+                <div className="px-3 py-1 text-xs bg-black/20 text-white/70 rounded-full">
+                  {formatMessageDate(parseISO(group.date).toISOString())}
                 </div>
               </div>
-            );
-          })
+              
+              {group.messages.map((message, messageIndex) => {
+                const isMe = message.sender_id === currentUser?.id;
+                const sender = isMe ? currentUser : selectedUser;
+                const showAvatar = messageIndex === 0 || 
+                  !shouldGroupMessages(message, group.messages[messageIndex - 1]);
+                const isGrouped = messageIndex > 0 && 
+                  shouldGroupMessages(message, group.messages[messageIndex - 1]);
+                
+                return (
+                  <div 
+                    key={message.id} 
+                    className={`flex items-end gap-2 ${isGrouped ? 'mt-1' : 'mt-4'} ${isMe ? "flex-row-reverse" : ""}`}
+                  >
+                    {showAvatar ? (
+                      <Avatar className="w-8 h-8">
+                        <img 
+                          src={sender?.avatar_url || "https://placeholder.com/avatar"} 
+                          alt={sender?.username || ""} 
+                          className="object-cover"
+                        />
+                      </Avatar>
+                    ) : (
+                      <div className="w-8 h-8" /> // Placeholder for alignment when avatar is hidden
+                    )}
+                    <div className="flex flex-col gap-1">
+                      <div className={`message-bubble ${isMe ? "sent" : "received"}`}>
+                        {message.content}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-muted">
+                        {formatMessageTime(message.created_at)}
+                        {isMe && message.read && <span className="w-3 h-3">✓</span>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))
         )}
         <div ref={messagesEndRef} />
       </div>
