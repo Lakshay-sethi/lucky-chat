@@ -12,7 +12,7 @@ export const Badge: React.FC<BadgeProps> = ({ count, className }) => {
   
   return (
     <div className={cn(
-      "bg-primary text-white text-xs font-medium rounded-full px-2 py-0.5 min-w-5 flex items-center justify-center",
+      "bg-green-500 text-white text-xs font-medium rounded-full px-2 py-0.5 min-w-5 flex items-center justify-center",
       className
     )}>
       {count > 99 ? '99+' : count}

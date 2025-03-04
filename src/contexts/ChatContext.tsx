@@ -36,6 +36,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
   const [users, setUsers] = useState<ChatUser[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [allMessages, setAllMessages] = useState<Message[]>([]);
 
   // Fetch current user
   useEffect(() => {
@@ -110,14 +111,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [currentUser]);
 
-  // Fetch messages when selectedUser changes
+  // Fetch all messages for the current user
   useEffect(() => {
-    if (!currentUser || !selectedUser) {
-      setMessages([]);
+    if (!currentUser) {
+      setAllMessages([]);
       return;
     }
 
-    const fetchMessages = async () => {
+    const fetchAllMessages = async () => {
       const { data, error } = await (supabase
         .from('messages') as any)
         .select('*')
@@ -125,24 +126,18 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .order('created_at', { ascending: true });
 
       if (error) {
-        console.error('Error fetching messages:', error);
+        console.error('Error fetching all messages:', error);
         return;
       }
-
-      // Filter messages for the selected conversation
-      const conversationMessages = (data as any[]).filter(
-        (msg: Message) => (msg.sender_id === currentUser.id && msg.receiver_id === selectedUser.id) || 
-               (msg.sender_id === selectedUser.id && msg.receiver_id === currentUser.id)
-      );
       
-      setMessages(conversationMessages as Message[]);
+      setAllMessages(data as Message[]);
     };
 
-    fetchMessages();
+    fetchAllMessages();
 
-    // Subscribe to new messages
+    // Subscribe to message changes
     const messageChannel = supabase
-      .channel('messages-changes')
+      .channel('all-messages-changes')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -150,18 +145,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }, async (payload) => {
         const message = payload.new as Message;
         
-        // Only update if the message belongs to the current conversation
-        if ((message.sender_id === currentUser.id && message.receiver_id === selectedUser.id) ||
-            (message.sender_id === selectedUser.id && message.receiver_id === currentUser.id)) {
-          
+        // Only update if the message is related to the current user
+        if (message.sender_id === currentUser.id || message.receiver_id === currentUser.id) {
           if (payload.eventType === 'INSERT') {
-            setMessages(current => [...current, message]);
+            setAllMessages(current => [...current, message]);
           } else if (payload.eventType === 'UPDATE') {
-            setMessages(current =>
+            setAllMessages(current =>
               current.map(msg => msg.id === message.id ? message : msg)
             );
           } else if (payload.eventType === 'DELETE') {
-            setMessages(current =>
+            setAllMessages(current =>
               current.filter(msg => msg.id !== payload.old.id)
             );
           }
@@ -172,7 +165,22 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       supabase.removeChannel(messageChannel);
     };
-  }, [currentUser, selectedUser]);
+  }, [currentUser]);
+
+  // Filter messages for the selected conversation
+  useEffect(() => {
+    if (!currentUser || !selectedUser) {
+      setMessages([]);
+      return;
+    }
+
+    const conversationMessages = allMessages.filter(
+      (msg: Message) => (msg.sender_id === currentUser.id && msg.receiver_id === selectedUser.id) || 
+              (msg.sender_id === selectedUser.id && msg.receiver_id === currentUser.id)
+    );
+    
+    setMessages(conversationMessages);
+  }, [currentUser, selectedUser, allMessages]);
 
   // Send message
   const sendMessage = async (content: string) => {
@@ -219,7 +227,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const getUnreadCount = (userId: string): number => {
     if (!currentUser) return 0;
     
-    return messages.filter(
+    return allMessages.filter(
       msg => msg.sender_id === userId && msg.receiver_id === currentUser.id && !msg.read
     ).length;
   };
