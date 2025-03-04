@@ -41,10 +41,14 @@ export const ChatSidebar = () => {
   const clearSearch = () => {
     setSearchTerm("");
   };
-
+  
   const handleUserClick = (user: any) => {
     setSelectedUser(user);
-    setIsChatVisible(true);
+    if (window.innerWidth < 768) {
+      setIsChatVisible(true);
+    } else {
+      setIsChatVisible(false);
+    }
   };
 
   const handleBackClick = () => {
