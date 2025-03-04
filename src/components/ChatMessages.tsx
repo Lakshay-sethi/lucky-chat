@@ -1,6 +1,5 @@
 
 import { Avatar } from "@/components/ui/avatar";
-import { Info } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { useChat } from "@/contexts/ChatContext";
@@ -129,9 +128,6 @@ export const ChatMessages = () => {
             </div>
           </div>
         </div>
-        <button className="p-2 hover:bg-white/5 rounded-full transition-colors">
-          <Info className="w-5 h-5" />
-        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">

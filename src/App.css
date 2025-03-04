@@ -40,3 +40,13 @@
 .read-the-docs {
   color: #888;
 }
+
+@media (min-width: 640px) {
+  .sidebar {
+    display: block !important;
+  }
+
+  .chat {
+    display: block !important;
+  }
+}
