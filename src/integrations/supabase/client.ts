@@ -17,11 +17,13 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 // Helper functions for file upload
-export const uploadFile = async (file: File, folder: string): Promise<string | null> => {
+export const uploadFile = async (file: File, senderId: string, receiverId: string): Promise<string | null> => {
   try {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2, 15)}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-    const filePath = `${folder}/${fileName}`;
+    
+    // Create path with sender and receiver IDs for better organization
+    const filePath = `users/${senderId}/conversations/${receiverId}/${fileName}`;
     
     const { error: uploadError } = await supabase.storage
       .from('media')

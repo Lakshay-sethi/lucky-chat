@@ -92,7 +92,8 @@ export const useMessages = (currentUser: ChatUser | null) => {
     // Handle file upload if a file was provided
     if (file) {
       fileType = getFileType(file);
-      fileUrl = await uploadFile(file, `${currentUser.id}/${selectedUser.id}`);
+      // Use the updated uploadFile function with sender and receiver IDs
+      fileUrl = await uploadFile(file, currentUser.id, selectedUser.id);
       
       if (!fileUrl) {
         console.error('Error uploading file');
