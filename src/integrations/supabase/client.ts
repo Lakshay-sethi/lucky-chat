@@ -4,22 +4,41 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { toast } from "@/hooks/use-toast";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Get credentials from localStorage if not in environment
+const getSupabaseCredentials = () => {
+  const envUrl = import.meta.env.VITE_SUPABASE_URL;
+  const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  
+  // First try to get from environment variables
+  if (envUrl && envKey) {
+    return { url: envUrl, key: envKey };
+  }
+  
+  // Fall back to localStorage
+  const localUrl = localStorage.getItem("VITE_SUPABASE_URL");
+  const localKey = localStorage.getItem("VITE_SUPABASE_ANON_KEY");
+  
+  return { 
+    url: localUrl || "", 
+    key: localKey || "" 
+  };
+};
 
-let supabaseClient: ReturnType<typeof createClient> | null = null;
+const { url: SUPABASE_URL, key: SUPABASE_PUBLISHABLE_KEY } = getSupabaseCredentials();
+
+let supabaseClient = null;
 
 try {
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     // Display a toast notification instead of throwing an error
     toast({
       title: "Missing Supabase Credentials",
-      description: "Please set your Supabase URL and Anon Key in the environment variables.",
+      description: "Please set your Supabase URL and Anon Key in the configuration form.",
       variant: "destructive",
     });
   } else {
     // Create the client if we have valid credentials
-    supabaseClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
   }
 } catch (error) {
   console.error("Error initializing Supabase client:", error);
@@ -42,7 +61,7 @@ function createDummyClient() {
           apply: () => {
             toast({
               title: "Supabase Not Configured",
-              description: "Please set your Supabase URL and Anon Key in the environment variables.",
+              description: "Please set your Supabase URL and Anon Key in the configuration form.",
               variant: "destructive",
             });
             return Promise.resolve({ error: { message: "Supabase client not initialized" } });
@@ -54,7 +73,7 @@ function createDummyClient() {
     }
   };
   
-  return new Proxy({}, handler) as ReturnType<typeof createClient>;
+  return new Proxy({}, handler);
 }
 
 // Helper functions for file upload
@@ -63,7 +82,7 @@ export const uploadFile = async (file: File, senderId: string, receiverId: strin
     if (!supabaseClient) {
       toast({
         title: "Upload Failed",
-        description: "Supabase client not initialized. Please check your environment variables.",
+        description: "Supabase client not initialized. Please check your configuration.",
         variant: "destructive",
       });
       return null;
