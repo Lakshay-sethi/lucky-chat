@@ -6,7 +6,8 @@ export type Message = {
   content: string;
   created_at: string;
   read: boolean;
-  image_url?: string | null;
+  file_url?: string | null;
+  file_type?: "image" | "video" | "audio" | "document" | null;
 };
 
 export type ChatUser = {
@@ -24,7 +25,7 @@ export interface ChatContextType {
   activeConversations: ChatUser[];
   nonConversationUsers: ChatUser[];
   setSelectedUser: (user: ChatUser | null) => void;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, file?: File) => Promise<void>;
   markMessagesAsRead: () => Promise<void>;
   getUnreadCount: (userId: string) => number;
   isNewConversationOpen: boolean;

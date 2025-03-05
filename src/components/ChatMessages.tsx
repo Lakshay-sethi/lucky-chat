@@ -4,6 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { useChat } from "@/contexts/ChatContext";
 import { format, isToday, isYesterday, isSameDay, parseISO } from "date-fns";
+import { MediaMessage } from "@/components/MediaMessage";
+import { Paperclip, Send, Image, FileVideo, FileAudio, FileText, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 // Helper function to format dates for message groups
 const formatMessageDate = (dateString: string) => {
@@ -33,6 +37,8 @@ const shouldGroupMessages = (curr: any, prev: any) => {
 export const ChatMessages = () => {
   const { currentUser, selectedUser, messages, sendMessage, markMessagesAsRead } = useChat();
   const [newMessage, setNewMessage] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when messages change
@@ -52,13 +58,29 @@ export const ChatMessages = () => {
     }
   }, [selectedUser, messages, markMessagesAsRead]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const clearSelectedFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedUser) return;
+    
+    // Prevent empty message with no file
+    if (!newMessage.trim() && !selectedFile) return;
 
     try {
-      await sendMessage(newMessage);
+      await sendMessage(newMessage, selectedFile || undefined);
       setNewMessage("");
+      clearSelectedFile();
     } catch (error) {
       toast({
         title: "Error",
@@ -99,6 +121,14 @@ export const ChatMessages = () => {
     
     return groups;
   };
+
+  // File type selection buttons
+  const fileTypeButtons = [
+    { type: 'image/*', icon: Image, label: 'Image' },
+    { type: 'video/*', icon: FileVideo, label: 'Video' },
+    { type: 'audio/*', icon: FileAudio, label: 'Audio' },
+    { type: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain', icon: FileText, label: 'Document' }
+  ];
 
   if (!selectedUser) {
     return (
@@ -168,10 +198,24 @@ export const ChatMessages = () => {
                     ) : (
                       <div className="w-8 h-8" /> // Placeholder for alignment when avatar is hidden
                     )}
-                    <div className="flex flex-col gap-1">
-                      <div className={`message-bubble ${isMe ? "sent" : "received"}`}>
-                        {message.content}
-                      </div>
+                    <div className={`flex flex-col gap-1 ${isMe ? "items-end" : "items-start"}`}>
+                      {/* Media content */}
+                      {message.file_url && message.file_type && (
+                        <div className={`media-message ${isMe ? "sent" : "received"}`}>
+                          <MediaMessage 
+                            fileUrl={message.file_url} 
+                            fileType={message.file_type} 
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Text content */}
+                      {message.content && (
+                        <div className={`message-bubble ${isMe ? "sent" : "received"}`}>
+                          {message.content}
+                        </div>
+                      )}
+                      
                       <div className="flex items-center gap-1 text-xs text-muted">
                         {formatMessageTime(message.created_at)}
                         {isMe && message.read && <span className="w-3 h-3">✓</span>}
@@ -186,8 +230,68 @@ export const ChatMessages = () => {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Selected file preview */}
+      {selectedFile && (
+        <div className="px-4 pt-2">
+          <div className="flex items-center gap-2 py-2 px-3 bg-primary/10 rounded-md">
+            <Paperclip className="h-4 w-4" />
+            <span className="text-sm truncate flex-1">{selectedFile.name}</span>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-6 w-6 p-0 rounded-full"
+              onClick={clearSelectedFile}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSendMessage} className="p-4">
         <div className="glass rounded-full p-2 flex items-center gap-2">
+          {/* File upload button */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="sm" 
+                className="h-9 w-9 p-0 rounded-full hover:bg-white/10"
+              >
+                <Paperclip className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start" alignOffset={8}>
+              <div className="flex p-1 gap-1">
+                {fileTypeButtons.map((btn, index) => (
+                  <Button
+                    key={index}
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="flex flex-col items-center h-auto py-2 px-3 gap-1"
+                    onClick={() => {
+                      if (fileInputRef.current) {
+                        fileInputRef.current.accept = btn.type;
+                        fileInputRef.current.click();
+                      }
+                    }}
+                  >
+                    <btn.icon className="h-5 w-5" />
+                    <span className="text-xs">{btn.label}</span>
+                  </Button>
+                ))}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileSelect}
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
+
           <input
             type="text"
             placeholder="Type a message..."
@@ -195,15 +299,15 @@ export const ChatMessages = () => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
           />
-          <button 
+          <Button 
             type="submit"
-            className="p-2 hover:bg-white/5 rounded-full transition-colors"
-            disabled={!newMessage.trim()}
+            variant="ghost"
+            size="sm"
+            className="h-9 w-9 p-0 rounded-full hover:bg-white/10"
+            disabled={!newMessage.trim() && !selectedFile}
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" />
-            </svg>
-          </button>
+            <Send className="h-5 w-5" />
+          </Button>
         </div>
       </form>
     </div>

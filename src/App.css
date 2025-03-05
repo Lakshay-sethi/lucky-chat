@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -49,4 +50,25 @@
   .chat {
     display: block !important;
   }
+}
+
+/* Media messages styling */
+.media-message {
+  max-width: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.media-message.sent {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.media-message.received {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure message bubbles and media messages stack nicely */
+.message-bubble + .media-message,
+.media-message + .message-bubble {
+  margin-top: 4px;
 }

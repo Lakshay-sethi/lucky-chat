@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, uploadFile, getFileType } from '@/integrations/supabase/client';
 import { Message, ChatUser } from '@/types/chat.types';
 
 export const useMessages = (currentUser: ChatUser | null) => {
@@ -80,15 +80,34 @@ export const useMessages = (currentUser: ChatUser | null) => {
   }, [currentUser, selectedUser, allMessages]);
 
   // Send message
-  const sendMessage = async (content: string) => {
-    if (!currentUser || !selectedUser || !content.trim()) return;
+  const sendMessage = async (content: string, file?: File) => {
+    if (!currentUser || !selectedUser) return;
+
+    // Empty message with no file is not allowed
+    if (!content.trim() && !file) return;
+
+    let fileUrl = null;
+    let fileType = null;
+
+    // Handle file upload if a file was provided
+    if (file) {
+      fileType = getFileType(file);
+      fileUrl = await uploadFile(file, `${currentUser.id}/${selectedUser.id}`);
+      
+      if (!fileUrl) {
+        console.error('Error uploading file');
+        return;
+      }
+    }
 
     const newMessage = {
       sender_id: currentUser.id,
       receiver_id: selectedUser.id,
       content,
       created_at: new Date().toISOString(),
-      read: false
+      read: false,
+      file_url: fileUrl,
+      file_type: fileType
     };
 
     const { error } = await (supabase
