@@ -3,18 +3,40 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Get credentials from environment vars or localStorage
+const getSupabaseCredentials = () => {
+  const envUrl = import.meta.env.VITE_SUPABASE_URL;
+  const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  
+  // Get from localStorage if available
+  const storedUrl = localStorage.getItem('supabase_url');
+  const storedKey = localStorage.getItem('supabase_anon_key');
+  
+  return {
+    url: storedUrl || envUrl,
+    key: storedKey || envKey
+  };
+};
 
+const credentials = getSupabaseCredentials();
 
-if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  throw new Error('Missing Supabase environment variables');
+if (!credentials.url || !credentials.key) {
+  console.warn('Missing Supabase credentials. Please set them in the credentials modal.');
 }
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+export let supabase = createClient<Database>(
+  credentials.url || '',
+  credentials.key || ''
+);
+
+// Function to update the Supabase client with new credentials
+export const updateSupabaseClient = (url: string, key: string) => {
+  supabase = createClient<Database>(url, key);
+  return supabase;
+};
 
 // Helper functions for file upload
 export const uploadFile = async (file: File, senderId: string, receiverId: string): Promise<string | null> => {
