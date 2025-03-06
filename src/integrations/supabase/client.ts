@@ -3,31 +3,18 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Default to empty strings to avoid errors during initialization
-// Real values will be set from localStorage or the modal input
-let SUPABASE_URL = '';
-let SUPABASE_PUBLISHABLE_KEY = '';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Try to get values from localStorage first
-if (typeof window !== 'undefined') {
-  SUPABASE_URL = localStorage.getItem('supabase_url') || '';
-  SUPABASE_PUBLISHABLE_KEY = localStorage.getItem('supabase_anon_key') || '';
+
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  throw new Error('Missing Supabase environment variables');
 }
 
-// Create the Supabase client with current values (could be empty initially)
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Import the supabase client like this:
+// import { supabase } from "@/integrations/supabase/client";
 
-// Function to update the Supabase client with new credentials
-export const updateSupabaseClient = (url: string, key: string) => {
-  // Create a new client with the provided credentials
-  const newClient = createClient<Database>(url, key);
-  
-  // Update the export - this won't affect existing imports
-  // but will affect future uses of the client in the same session
-  Object.assign(supabase, newClient);
-  
-  return newClient;
-};
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 // Helper functions for file upload
 export const uploadFile = async (file: File, senderId: string, receiverId: string): Promise<string | null> => {
