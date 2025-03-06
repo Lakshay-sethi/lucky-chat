@@ -25,20 +25,25 @@ export const uploadFile = async (file: File, senderId: string, receiverId: strin
     // Create path with sender and receiver IDs for better organization
     const filePath = `users/${senderId}/conversations/${receiverId}/${fileName}`;
     
-    const { error: uploadError } = await supabase.storage
-      .from('media')
-      .upload(filePath, file);
-      
+    const { data, error: uploadError } = await supabase.storage
+        .from('media')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
     if (uploadError) {
       console.error('Error uploading file:', uploadError);
       return null;
     }
-    
-    const { data } = supabase.storage
-      .from('media')
-      .getPublicUrl(filePath);
+
+      // Generate signed URL
+      const { data: { signedUrl }, error: signedUrlError } = await supabase.storage
+        .from('media')
+        .createSignedUrl(filePath, 6000000); // URL valid for 60 seconds
+
       
-    return data.publicUrl;
+    return signedUrl;
   } catch (error) {
     console.error('Error in uploadFile:', error);
     return null;

@@ -20,10 +20,13 @@ export const MediaMessage = ({ fileUrl, fileType, fileName }: MediaMessageProps)
     // Extract filename from URL
     const urlParts = fileUrl.split('/');
     const fullName = urlParts[urlParts.length - 1];
+    console.log('Full name:', fullName);
+    // Remove everything after '?' if it exists
+    const nameWithoutQuery = fullName.split('?')[0];
     
     // Decode URL-encoded characters
-    const decoded = decodeURIComponent(fullName);
-    
+    const decoded = decodeURIComponent(nameWithoutQuery);
+    console.log('Decoded:', decoded);
     // Remove any random prefixes
     const nameParts = decoded.split('_');
     return nameParts.length > 1 ? nameParts.slice(1).join('_') : decoded;
