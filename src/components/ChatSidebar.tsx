@@ -59,7 +59,7 @@ export const ChatSidebar = () => {
   return (
     <div className="w-80 glass p-4 flex flex-col gap-4">
       <div className={`sidebar ${isChatVisible ? 'hidden' : 'block'}`}>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Avatar className="w-8 h-8">
               <img 
@@ -88,7 +88,7 @@ export const ChatSidebar = () => {
           </div>
         </div>
         
-        <div className="relative">
+        <div className="relative mb-4">
           <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" />
           <Input
             type="text"
