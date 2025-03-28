@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { encryptMessage, decryptMessage } from '@/lib/encryption';
 import { supabase, uploadFile, getFileType } from '@/integrations/supabase/client';
 import { Message, ChatUser } from '@/types/chat.types';
 
@@ -27,7 +28,12 @@ export const useMessages = (currentUser: ChatUser | null) => {
         return;
       }
       
-      setAllMessages(data as Message[]);
+      // Decrypt messages before setting them
+      const decryptedMessages = (data as Message[]).map(message => ({
+        ...message,
+        content: message.content ? decryptMessage(message.content) : ''
+      }));
+      setAllMessages(decryptedMessages);
     };
 
     fetchAllMessages();
@@ -45,10 +51,14 @@ export const useMessages = (currentUser: ChatUser | null) => {
         // Only update if the message is related to the current user
         if (message.sender_id === currentUser.id || message.receiver_id === currentUser.id) {
           if (payload.eventType === 'INSERT') {
-            setAllMessages(current => [...current, message]);
+            const decryptedMessage = {
+              ...message,
+              content: message.content ? decryptMessage(message.content) : ''
+            };
+            setAllMessages(current => [...current, decryptedMessage]);
           } else if (payload.eventType === 'UPDATE') {
             setAllMessages(current =>
-              current.map(msg => msg.id === message.id ? message : msg)
+              current.map(msg => msg.id === message.id ? { ...message, content: message.content ? decryptMessage(message.content) : '' } : msg)
             );
           } else if (payload.eventType === 'DELETE') {
             setAllMessages(current =>
@@ -104,7 +114,7 @@ export const useMessages = (currentUser: ChatUser | null) => {
     const newMessage = {
       sender_id: currentUser.id,
       receiver_id: selectedUser.id,
-      content,
+      content: content ? encryptMessage(content) : '',
       created_at: new Date().toISOString(),
       read: false,
       file_url: fileUrl,
