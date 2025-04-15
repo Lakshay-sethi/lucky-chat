@@ -1,4 +1,3 @@
-
 import { ChatSidebar } from "@/components/ChatSidebar";
 import { ChatMessages } from "@/components/ChatMessages";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { LogOut } from "lucide-react";
 import { ChatProvider } from "@/contexts/ChatContext";
+import { Analytics } from "@vercel/analytics/react"; // Import Analytics
 
 const Index = () => {
   const navigate = useNavigate();
@@ -52,6 +52,7 @@ const Index = () => {
           <ChatMessages />
         </div>
       </div>
+      <Analytics /> {/* Add Analytics here */}
     </ChatProvider>
   );
 };
